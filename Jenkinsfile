@@ -22,9 +22,7 @@ pipeline {
             }
         }
         stage('Push Docker Image') {
-            when {
-                branch 'example-solution'
-            }
+            
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
@@ -35,22 +33,27 @@ pipeline {
             }
         }
         stage('DeployToProduction') {
-            when {
-                branch 'example-solution'
-            }
+            
             steps {
                 input 'Deploy to Production?'
                 milestone(1)
                 withCredentials([sshUserPrivateKey(credentialsId: 'docker-ssh', keyFileVariable: 'KEYFILE', usernameVariable: 'USERNAME')]) {
                     script {
-                        sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker pull golfplease/train-schedule:${env.BUILD_NUMBER}\""
+                        def remote = [:]
+                        remote.name = $prod_ip
+                        remote.host = $prod_ip
+                        remote.allowAnyHosts = true
+                        
+                        remote.user = USERNAME
+                        remote.identityFile = KEYFILE
+                        sshCommand remote: remote, command: "docker pull golfplease/train-schedule:${env.BUILD_NUMBER}", failOnError: 'true'
                         try {
-                            sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker stop train-schedule\""
-                            sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker rm train-schedule\""
+                            sshCommand remote: remote, command: "docker stop train-schedule", failOnError: 'false'
+                            sshCommand remote: remote, command: "docker rm train-schedule", failOnError: 'false'
                         } catch (err) {
                             echo: 'caught error: $err'
                         }
-                        sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8082 -d golfplease/train-schedule:${env.BUILD_NUMBER}\""
+                        sshCommand remote: remote, command: "docker run --restart always --name train-schedule -p 8080:8082 -d golfplease/train-schedule:${env.BUILD_NUMBER}", failOnError: 'true'
                     }
                 }
             }
