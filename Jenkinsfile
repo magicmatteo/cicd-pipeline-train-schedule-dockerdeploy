@@ -40,8 +40,8 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'docker-ssh', keyFileVariable: 'KEYFILE', usernameVariable: 'USERNAME')]) {
                     script {
                         def remote = [:]
-                        remote.name = $prod_ip
-                        remote.host = $prod_ip
+                        remote.name = prod_ip
+                        remote.host = prod_ip
                         remote.allowAnyHosts = true
                         
                         remote.user = USERNAME
