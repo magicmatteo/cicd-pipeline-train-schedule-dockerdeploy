@@ -62,7 +62,9 @@ pipeline {
             steps {
                 input 'Deploy to Production?'
                 sh 'docker ps'
-                docker.stop('train-schedule')
+                script {                
+                    docker.stop('train-schedule')
+                }
             }
         }
     }
