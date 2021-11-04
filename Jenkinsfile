@@ -60,7 +60,7 @@ pipeline {
         stage('DeployToProduction') {
             milestone(1)
             steps {
-                input 'Deploy to Production?'
+                input 'Does staging look okay? Proceed to deploy to production'
                 sh 'docker pull golfplease/train-schedule:latest'
                 sh 'docker stop train-schedule-prod'
                 sh 'docker rm train-schedule-prod'
