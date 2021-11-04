@@ -34,7 +34,7 @@ pipeline {
             
             steps {
                 input 'Deploy to Production?'
-                milestone(2)
+                
                 withCredentials([sshUserPrivateKey(credentialsId: 'docker-ssh', keyFileVariable: 'KEYFILE', usernameVariable: 'USERNAME')]) {
                     script {
                         def remote = [:]
