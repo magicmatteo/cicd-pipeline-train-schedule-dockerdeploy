@@ -58,8 +58,8 @@ pipeline {
             }
         }
         stage('DeployToProduction') {
-            milestone(1)
             steps {
+                milestone(1)
                 input 'Does staging look okay? Proceed to deploy to production'
                 sh 'docker pull golfplease/train-schedule:latest'
                 sh 'docker stop train-schedule-prod'
