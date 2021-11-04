@@ -32,11 +32,10 @@ pipeline {
                 }
             }
         }
-        stage('DeployToProduction') {
+        stage('DeployToStaging') {
             
             steps {
-                input 'Deploy to Production?'
-                
+                                
                 withCredentials([sshUserPrivateKey(credentialsId: 'docker-ssh', keyFileVariable: 'KEYFILE', usernameVariable: 'USERNAME')]) {
                     script {
                         def remote = [:]
@@ -56,6 +55,14 @@ pipeline {
                         sshCommand remote: remote, command: "docker run --restart always --name train-schedule -p 8082:8080 -d golfplease/train-schedule:${env.BUILD_NUMBER}", failOnError: 'true'
                     }
                 }
+            }
+        }
+        stage('DeployToProduction') {
+            
+            steps {
+                input 'Deploy to Production?'
+                sh 'docker ps'
+                docker.stop('train-schedule')
             }
         }
     }
