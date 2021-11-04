@@ -13,9 +13,9 @@ pipeline {
                 branch 'example-solution'
             }
             steps {
-                node {
+                script {
                     def app = docker.build('golfplease/train-schedule')
-                    customImage.inside {
+                    app.inside {
                         sh echo 'make test'
                     }
                 }
@@ -26,7 +26,7 @@ pipeline {
                 branch 'example-solution'
             }
             steps {
-                node {
+                script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
