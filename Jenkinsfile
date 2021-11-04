@@ -41,16 +41,16 @@ pipeline {
             steps {
                 input 'Deploy to Production?'
                 milestone(1)
-                withCredentials([usernamePassword(credentialsId: 'docker-ssh', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'docker-ssh', keyFileVariable: 'KEYFILE', usernameVariable: 'USERNAME')]) {
                     script {
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull golfplease/train-schedule:${env.BUILD_NUMBER}\""
+                        sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker pull golfplease/train-schedule:${env.BUILD_NUMBER}\""
                         try {
-                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop train-schedule\""
-                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm train-schedule\""
+                            sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker stop train-schedule\""
+                            sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker rm train-schedule\""
                         } catch (err) {
                             echo: 'caught error: $err'
                         }
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8082 -d golfplease/train-schedule:${env.BUILD_NUMBER}\""
+                        sh "ssh -o StrictHostKeyChecking=no -i $KEYFILE $USERNAME@$prod_ip \"docker run --restart always --name train-schedule -p 8080:8082 -d golfplease/train-schedule:${env.BUILD_NUMBER}\""
                     }
                 }
             }
