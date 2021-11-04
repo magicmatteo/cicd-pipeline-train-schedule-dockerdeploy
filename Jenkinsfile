@@ -61,10 +61,18 @@ pipeline {
             steps {
                 milestone(1)
                 input 'Does staging look okay? Proceed to deploy to production'
-                sh 'docker pull golfplease/train-schedule:latest'
-                sh 'docker stop train-schedule-prod'
-                sh 'docker rm train-schedule-prod'
-                sh 'docker run --restart always --name train-schedule-prod -p 8083:8080 -d golfplease/train-schedule:latest'
+                script {
+                    
+                    sh 'docker pull golfplease/train-schedule:latest'
+                    try {
+                        sh 'docker stop train-schedule-prod'
+                        sh 'docker rm train-schedule-prod'
+                    } catch (err) {
+                            echo: 'caught error: $err'
+                    }
+                    sh 'docker run --restart always --name train-schedule-prod -p 8083:8080 -d golfplease/train-schedule:latest'
+
+                }
             }
         }
     }
