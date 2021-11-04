@@ -4,7 +4,6 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Running build automation'
-                echo $prod_ip
                 echo prod_ip
                 sh './gradlew build --no-daemon'
                 archiveArtifacts artifacts: 'dist/trainSchedule.zip'
