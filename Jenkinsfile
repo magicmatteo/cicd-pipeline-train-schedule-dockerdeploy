@@ -53,7 +53,7 @@ pipeline {
                         } catch (err) {
                             echo: 'caught error: $err'
                         }
-                        sshCommand remote: remote, command: "docker run --restart always --name train-schedule -p 8080:8082 -d golfplease/train-schedule:${env.BUILD_NUMBER}", failOnError: 'true'
+                        sshCommand remote: remote, command: "docker run --restart always --name train-schedule -p 8082:8080 -d golfplease/train-schedule:${env.BUILD_NUMBER}", failOnError: 'true'
                     }
                 }
             }
