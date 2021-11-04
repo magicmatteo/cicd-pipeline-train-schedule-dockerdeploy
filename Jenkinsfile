@@ -9,9 +9,7 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
-            when {
-                branch 'example-solution'
-            }
+            
             steps {
                 script {
                     app = docker.build('golfplease/train-schedule')
