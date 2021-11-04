@@ -58,13 +58,13 @@ pipeline {
             }
         }
         stage('DeployToProduction') {
-            
+            milestone(1)
             steps {
                 input 'Deploy to Production?'
-                sh 'docker ps'
-                script {                
-                    docker.stop('train-schedule')
-                }
+                sh 'docker pull golfplease/train-schedule:latest'
+                sh 'docker stop train-schedule-prod'
+                sh 'docker rm train-schedule-prod'
+                sh 'docker run --restart always --name train-schedule-prod -p 8083:8080 -d golfplease/train-schedule:latest'
             }
         }
     }
