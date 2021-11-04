@@ -13,10 +13,10 @@ pipeline {
                 branch 'example-solution'
             }
             steps {
-                script {
-                    app = docker.build('golfplease/train-schedule')
-                    app.inside {
-                        sh 'echo $(curl localhost:8080)'
+                node {
+                    def app = docker.build('golfplease/train-schedule')
+                    customImage.inside {
+                        sh echo 'make test'
                     }
                 }
             }
@@ -26,7 +26,7 @@ pipeline {
                 branch 'example-solution'
             }
             steps {
-                script {
+                node {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
